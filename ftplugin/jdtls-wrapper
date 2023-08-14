@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+EXECUTABLE_PATH="$HOME/.local/share/nvim/mason/bin/jdtls"
+
+JAVA_HOME=$JAVA_HOME_17 $EXECUTABLE_PATH

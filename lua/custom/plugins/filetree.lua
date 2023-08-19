@@ -12,7 +12,11 @@ return {
 		'nvim-tree/nvim-web-devicons',
 	},
 	config = function()
-		require('nvim-tree').setup {}
+		require('nvim-tree').setup {
+			view = {
+				width = 55
+			}
+		}
 		vim.keymap.set('n', '<leader>,', '<cmd>NvimTreeFindFileToggle<CR>zz', { desc = 'Toggle File Explorer' })
 	end,
 }

@@ -38,7 +38,9 @@ return {
       -- online, please don't ask me how to install them :)
       ensure_installed = {
         -- Update this to ensure that you have the debuggers for the langs you want
-        'delve',
+        'javadbg',
+        'javatest',
+        'elixir'
       },
     }
 
@@ -47,10 +49,21 @@ return {
     vim.keymap.set('n', '<F1>', dap.step_into, { desc = 'Debug: Step Into' })
     vim.keymap.set('n', '<F2>', dap.step_over, { desc = 'Debug: Step Over' })
     vim.keymap.set('n', '<F3>', dap.step_out, { desc = 'Debug: Step Out' })
-    vim.keymap.set('n', '<leader>b', dap.toggle_breakpoint, { desc = 'Debug: Toggle Breakpoint' })
-    vim.keymap.set('n', '<leader>B', function()
+    vim.keymap.set('n', '<leader>bb', dap.toggle_breakpoint, { desc = 'Debug: Toggle Breakpoint' })
+    vim.keymap.set('n', '<leader>bc', function()
       dap.set_breakpoint(vim.fn.input 'Breakpoint condition: ')
     end, { desc = 'Debug: Set Breakpoint' })
+    map('n', '<leader>bl', function() dap.set_breakpoint(nil, nil, vim.fn.input('Log point message: ')) end, 'Set log point', 'DAP')
+    map('n', '<leader>br', dap.clear_breakpoints, 'Clear breakpoints', 'DAP')
+    map('n', '<leader>ba', '<cmd>Telescope dap list_breakpoints<cr>', 'List breakpoints', 'DAP')
+    map('n', '<leader>dd', dap.disconnect, 'Disconnect', 'DAP')
+    map('n', '<leader>dt', dap.terminate, 'Terminate', 'DAP')
+    map('n', '<leader>dr', dap.repl.toggle, 'Open REPL', 'DAP')
+    map('n', '<leader>dl', dap.run_last, 'Run last', 'DAP')
+    map('n', '<leader>di', dapWidgets.hover, 'Variables', 'DAP')
+    map('n', '<leader>d?', function() dapWidgets.centered_float(dapWidgets.scopes) end, 'Scopes', 'DAP')
+    map('n', '<leader>df', '<cmd>Telescope dap frames<cr>', 'List frames', 'DAP')
+    map('n', '<leader>dh', '<cmd>Telescope dap commands<cr>', 'List commands', 'DAP')
 
     -- Dap UI setup
     -- For more information, see |:help nvim-dap-ui|
@@ -80,8 +93,5 @@ return {
     dap.listeners.after.event_initialized['dapui_config'] = dapui.open
     dap.listeners.before.event_terminated['dapui_config'] = dapui.close
     dap.listeners.before.event_exited['dapui_config'] = dapui.close
-
-    -- Install golang specific config
-    require('dap-go').setup()
   end,
 }

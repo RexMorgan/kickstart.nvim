@@ -43,6 +43,12 @@ P.S. You can delete this when you're done too. It's your config now :)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
+vim.g.loaded_perl_provider = 0
+vim.g.loaded_ruby_provider = 0
+vim.g.loaded_node_provider = 0
+vim.g.loaded_python_provider = 0
+vim.g.loaded_python3_provider = 0
+
 -- Install package manager
 --    https://github.com/folke/lazy.nvim
 --    `:help lazy.nvim.txt` for more info
@@ -106,6 +112,7 @@ require('lazy').setup({
 
       -- Adds a number of user-friendly snippets
       'rafamadriz/friendly-snippets',
+	    'onsails/lspkind.nvim',
     },
   },
 
@@ -313,7 +320,7 @@ vim.keymap.set('n', '<leader>sd', require('telescope.builtin').diagnostics, { de
 -- See `:help nvim-treesitter`
 require('nvim-treesitter.configs').setup {
   -- Add languages to be installed here that you want installed for treesitter
-  ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'typescript', 'vimdoc', 'vim' },
+  ensure_installed = { 'go', 'lua', 'python', 'rust', 'tsx', 'typescript', 'vimdoc', 'vim', 'java', 'elixir' },
 
   -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
   auto_install = false,
@@ -424,6 +431,7 @@ local on_attach = function(_, bufnr)
   vim.api.nvim_buf_create_user_command(bufnr, 'Format', function(_)
     vim.lsp.buf.format()
   end, { desc = 'Format current buffer with LSP' })
+  nmap('<leader>fd', vim.lsp.buf.format, '[F]ormat document')
 end
 
 -- Enable the following language servers
@@ -448,6 +456,60 @@ local servers = {
       telemetry = { enable = false },
     },
   },
+
+  jdtls = {
+    java = {
+      format = {
+        settings = {
+          url = os.getenv('HOME') .. '/.config/nvim/configs/eclipse-code-format.xml',
+          profile = "Indeed"
+        }
+      },
+      signatureHelp = { enabled = true },
+      contentProvider = { preferred = 'fernflower' },
+      configuration = {
+        runtimes = {
+          {
+            name = 'JavaSE-1.8',
+            path = os.getenv('JAVA_HOME'),
+            default = true
+          }
+        }
+      },
+      completion = {
+        importOrder = {
+          '',
+          'javax',
+          'java',
+          '#'
+        }
+      },
+      sources = {
+        organizeImports = {
+          starThreshold = 9999;
+          staticStarThreshold = 9999;
+        },
+      },
+      codeGeneration = {
+        toString = {
+          template = "${object.className}{${member.name()}=${member.value}, ${otherMembers}}"
+        },
+        hashCodeEquals = {
+          useJava7Objects = true,
+        },
+        useBlocks = true
+      },
+      import = {
+        gradle = {
+          enabled = true,
+          home = os.getenv('HOME') .. '/.gradle/',
+          java = {
+            home = os.getenv('JAVA_HOME')
+          }
+        }
+      }
+    }
+  }
 }
 
 -- Setup neovim lua configuration
@@ -464,17 +526,25 @@ mason_lspconfig.setup {
   ensure_installed = vim.tbl_keys(servers),
 }
 
-mason_lspconfig.setup_handlers {
-  function(server_name)
-    if(server_name == 'jdtls') then
-      return
-    end
-    require('lspconfig')[server_name].setup {
+local get_lsp_config = function(server_name)
+  local success, configFunc = pcall(require, 'lspconfigs.' .. server_name)
+
+  if success then
+    return configFunc(capabilities, on_attach, servers[server_name])
+  else
+    return {
       capabilities = capabilities,
       on_attach = on_attach,
       settings = servers[server_name],
       filetypes = (servers[server_name] or {}).filetypes,
     }
+  end
+end
+
+mason_lspconfig.setup_handlers {
+  function(server_name)
+    local config = get_lsp_config(server_name)
+    require('lspconfig')[server_name].setup(config)
   end
 }
 
@@ -482,10 +552,29 @@ mason_lspconfig.setup_handlers {
 -- See `:help cmp`
 local cmp = require 'cmp'
 local luasnip = require 'luasnip'
+local cmp_autopairs = require('nvim-autopairs.completion.cmp')
+local lspkind = require('lspkind')
+
 require('luasnip.loaders.from_vscode').lazy_load()
 luasnip.config.setup {}
 
+cmp.event:on(
+  'confirm_done',
+  cmp_autopairs.on_confirm_done()
+)
+
 cmp.setup {
+  formatting = {
+    format = lspkind.cmp_format({
+      mode = 'symbol_text',
+      maxwidth = 50,
+      ellipsis_char = '...',
+      preset = 'codicons',
+      before = function (_, vim_item)
+        return vim_item
+      end
+    })
+  },
   snippet = {
     expand = function(args)
       luasnip.lsp_expand(args.body)
@@ -523,6 +612,7 @@ cmp.setup {
   sources = {
     { name = 'nvim_lsp' },
     { name = 'luasnip' },
+    { name = 'jdtls' },
   },
 }
 

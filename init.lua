@@ -390,7 +390,7 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 
 -- [[ Configure LSP ]]
 --  This function gets run when an LSP connects to a particular buffer.
-local on_attach = function(_, bufnr)
+local on_attach = function(c, bufnr)
   -- NOTE: Remember that lua is a real programming language, and as such it is possible
   -- to define small helper and utility functions so you don't have to repeat yourself
   -- many times.
@@ -529,15 +529,27 @@ mason_lspconfig.setup {
 local get_lsp_config = function(server_name)
   local success, configFunc = pcall(require, 'lspconfigs.' .. server_name)
 
+  local default_config = {
+    capabilities = capabilities,
+    on_attach = on_attach,
+    settings = servers[server_name],
+    filetypes = (servers[server_name] or {}).filetypes,
+  };
+
   if success then
-    return configFunc(capabilities, on_attach, servers[server_name])
-  else
-    return {
+    local config = configFunc({
       capabilities = capabilities,
-      on_attach = on_attach,
-      settings = servers[server_name],
-      filetypes = (servers[server_name] or {}).filetypes,
-    }
+      default_on_attach = on_attach
+    })
+
+    return setmetatable(config, { __index = default_config })
+  else
+    return setmetatable({
+      capabilities = capabilities,
+      on_attach = on_attach
+    }, {
+      __index = default_config
+    })
   end
 end
 

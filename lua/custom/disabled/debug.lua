@@ -44,6 +44,7 @@ return {
       },
     }
 
+    local dapWidgets = require('dap.ui.widgets')
     -- Basic debugging keymaps, feel free to change to your liking!
     vim.keymap.set('n', '<F5>', dap.continue, { desc = 'Debug: Start/Continue' })
     vim.keymap.set('n', '<F1>', dap.step_into, { desc = 'Debug: Step Into' })
@@ -53,17 +54,17 @@ return {
     vim.keymap.set('n', '<leader>bc', function()
       dap.set_breakpoint(vim.fn.input 'Breakpoint condition: ')
     end, { desc = 'Debug: Set Breakpoint' })
-    map('n', '<leader>bl', function() dap.set_breakpoint(nil, nil, vim.fn.input('Log point message: ')) end, 'Set log point', 'DAP')
-    map('n', '<leader>br', dap.clear_breakpoints, 'Clear breakpoints', 'DAP')
-    map('n', '<leader>ba', '<cmd>Telescope dap list_breakpoints<cr>', 'List breakpoints', 'DAP')
-    map('n', '<leader>dd', dap.disconnect, 'Disconnect', 'DAP')
-    map('n', '<leader>dt', dap.terminate, 'Terminate', 'DAP')
-    map('n', '<leader>dr', dap.repl.toggle, 'Open REPL', 'DAP')
-    map('n', '<leader>dl', dap.run_last, 'Run last', 'DAP')
-    map('n', '<leader>di', dapWidgets.hover, 'Variables', 'DAP')
-    map('n', '<leader>d?', function() dapWidgets.centered_float(dapWidgets.scopes) end, 'Scopes', 'DAP')
-    map('n', '<leader>df', '<cmd>Telescope dap frames<cr>', 'List frames', 'DAP')
-    map('n', '<leader>dh', '<cmd>Telescope dap commands<cr>', 'List commands', 'DAP')
+    vim.keymap.set('n', '<leader>bl', function() dap.set_breakpoint(nil, nil, vim.fn.input('Log point message: ')) end, { desc = 'Set log point' })
+    vim.keymap.set('n', '<leader>br', dap.clear_breakpoints, { desc = 'Clear breakpoints' })
+    vim.keymap.set('n', '<leader>ba', '<cmd>Telescope dap list_breakpoints<cr>', { desc = 'List breakpoints' })
+    vim.keymap.set('n', '<leader>dd', dap.disconnect, { desc = 'Disconnect' })
+    vim.keymap.set('n', '<leader>dt', dap.terminate, { desc = 'Terminate' })
+    vim.keymap.set('n', '<leader>dr', dap.repl.toggle, { desc = 'Open REPL' })
+    vim.keymap.set('n', '<leader>dl', dap.run_last, { desc = 'Run last' })
+    vim.keymap.set('n', '<leader>di', dapWidgets.hover, { desc = 'Variables' })
+    vim.keymap.set('n', '<leader>d?', function() dapWidgets.centered_float(dapWidgets.scopes) end, { desc = 'Scopes' })
+    vim.keymap.set('n', '<leader>df', '<cmd>Telescope dap frames<cr>', { desc = 'List frames' })
+    vim.keymap.set('n', '<leader>dh', '<cmd>Telescope dap commands<cr>', { desc = 'List commands' })
 
     -- Dap UI setup
     -- For more information, see |:help nvim-dap-ui|

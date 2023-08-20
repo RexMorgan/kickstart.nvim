@@ -3,7 +3,6 @@ local configPath = os.getenv('HOME') .. '/.config/nvim'
 local wrapperPath = configPath .. '/ftplugin/jdtls-wrapper'
 
 local util = require 'lspconfig.util'
-local handlers = require 'vim.lsp.handlers'
 
 local bundles = {
   vim.fn.glob(configPath .. '/plugins/com.microsoft.java.debug.plugin-*.jar', 1),

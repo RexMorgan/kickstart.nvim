@@ -92,7 +92,7 @@ require('lazy').setup({
 
       -- Useful status updates for LSP
       -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
-      { 'j-hui/fidget.nvim', tag = 'legacy', event = "LspAttach", opts = {} },
+      { 'j-hui/fidget.nvim',       tag = 'legacy', event = "LspAttach", opts = {} },
 
       -- Additional lua configuration, makes nvim stuff amazing!
       'folke/neodev.nvim',
@@ -112,12 +112,12 @@ require('lazy').setup({
 
       -- Adds a number of user-friendly snippets
       'rafamadriz/friendly-snippets',
-	    'onsails/lspkind.nvim',
+      'onsails/lspkind.nvim',
     },
   },
 
   -- Useful plugin to show you pending keybinds.
-  { 'folke/which-key.nvim', opts = {} },
+  { 'folke/which-key.nvim',  opts = {} },
   {
     -- Adds git related signs to the gutter, as well as utilities for managing changes
     'lewis6991/gitsigns.nvim',
@@ -131,7 +131,8 @@ require('lazy').setup({
         changedelete = { text = '~' },
       },
       on_attach = function(bufnr)
-        vim.keymap.set('n', '<leader>gp', require('gitsigns').prev_hunk, { buffer = bufnr, desc = '[G]o to [P]revious Hunk' })
+        vim.keymap.set('n', '<leader>gp', require('gitsigns').prev_hunk,
+          { buffer = bufnr, desc = '[G]o to [P]revious Hunk' })
         vim.keymap.set('n', '<leader>gn', require('gitsigns').next_hunk, { buffer = bufnr, desc = '[G]o to [N]ext Hunk' })
         vim.keymap.set('n', '<leader>ph', require('gitsigns').preview_hunk, { buffer = bufnr, desc = '[P]review [H]unk' })
       end,
@@ -292,6 +293,12 @@ require('telescope').setup {
         ['<C-d>'] = false,
       },
     },
+    file_ignore_patterns = {
+      "node_modules",
+      "_build",
+      "deps",
+      "assets/vendor"
+    }
   },
 }
 
@@ -320,7 +327,8 @@ vim.keymap.set('n', '<leader>sd', require('telescope.builtin').diagnostics, { de
 -- See `:help nvim-treesitter`
 require('nvim-treesitter.configs').setup {
   -- Add languages to be installed here that you want installed for treesitter
-  ensure_installed = { 'go', 'lua', 'python', 'rust', 'tsx', 'typescript', 'vimdoc', 'vim', 'java', 'elixir' },
+  ensure_installed = { 'go', 'lua', 'python', 'rust', 'tsx', 'typescript', 'vimdoc', 'vim', 'java', 'elixir', 'eex',
+    'heex', 'html', 'erlang' },
 
   -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
   auto_install = false,
@@ -486,8 +494,8 @@ local servers = {
       },
       sources = {
         organizeImports = {
-          starThreshold = 9999;
-          staticStarThreshold = 9999;
+          starThreshold = 9999,
+          staticStarThreshold = 9999,
         },
       },
       codeGeneration = {
@@ -582,7 +590,7 @@ cmp.setup {
       maxwidth = 50,
       ellipsis_char = '...',
       preset = 'codicons',
-      before = function (_, vim_item)
+      before = function(_, vim_item)
         return vim_item
       end
     })
